@@ -7,3 +7,4 @@ node_modules/
 .agents/
 data/
 *.log
+decisions.tsv

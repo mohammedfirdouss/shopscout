@@ -1,0 +1,31 @@
+{
+  "name": "shopscout",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "bot": "node --experimental-strip-types src/bot.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohammedfirdouss/shopscout.git"
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/mohammedfirdouss/shopscout/issues"
+  },
+  "homepage": "https://github.com/mohammedfirdouss/shopscout#readme",
+  "private": "true",
+  "dependencies": {
+    "@celo/attribution-tags": "^0.5.0",
+    "@x402/core": "^2.30.0",
+    "@x402/evm": "^2.30.0",
+    "@x402/fetch": "^2.30.0",
+    "grammy": "^1.46.0",
+    "viem": "^2.57.16"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}

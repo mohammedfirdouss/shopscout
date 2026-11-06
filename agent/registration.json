@@ -1,0 +1,11 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "ShopScout",
+  "description": "Weekly competitor reports for small Instagram sellers. Pays for public Instagram data per call over x402 on Celo through the buy gateway.",
+  "services": [
+    { "name": "web", "endpoint": "https://github.com/mohammedfirdouss/shopscout" }
+  ],
+  "x402Support": false,
+  "active": true,
+  "supportedTrust": ["reputation"]
+}
