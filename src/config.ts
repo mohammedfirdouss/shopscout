@@ -11,6 +11,7 @@ const NETWORKS = {
     tokens: {
       USDC: { asset: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C", feeAdapter: "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B" },
       USAT: { asset: "0xD2ab3C9A02DBBAB236BfEC45D1d755DF4267F771", feeAdapter: "0x0357EE22278c922e1D36cFe6b899269b161880C4" },
+      USDT: { asset: "0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e", feeAdapter: "0x0E2A3e05bc9A16F5292A6170456A710cb89C6f72" },
     },
     explorer: "https://celoscan.io",
   },
@@ -33,7 +34,7 @@ function required(name: string): string {
 const network = (process.env.SHOPSCOUT_NETWORK ?? "sandbox") as Network;
 if (!(network in NETWORKS)) throw new Error(`SHOPSCOUT_NETWORK must be mainnet or sandbox, got ${network}`);
 
-// The stablecoin the agent pays with: USAT (free from the Self faucet) or USDC.
+// The stablecoin the agent pays with: USAT, USDT or USDC.
 const tokens: Record<string, { asset: string; feeAdapter: `0x${string}` | undefined }> = NETWORKS[network].tokens;
 const payToken = process.env.SHOPSCOUT_PAY_TOKEN ?? (network === "mainnet" ? "USAT" : "USDC");
 if (!tokens[payToken]) throw new Error(`SHOPSCOUT_PAY_TOKEN ${payToken} is not available on ${network}`);

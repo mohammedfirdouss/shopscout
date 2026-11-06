@@ -14,7 +14,7 @@ The seller never sees crypto. ShopScout's agent wallet pays for the data.
 
 ## How it pays for data
 
-Instagram data comes from the [buy](https://usebuy.ai) gateway, paid per call over [x402](https://x402.celo.org) in USA₮ (or USDC, via `SHOPSCOUT_PAY_TOKEN`) on Celo mainnet. ShopScout doesn't own these services.
+Instagram data comes from the [buy](https://usebuy.ai) gateway, paid per call over [x402](https://x402.celo.org) in USA₮, USD₮ or USDC (set `SHOPSCOUT_PAY_TOKEN`) on Celo mainnet. ShopScout doesn't own these services.
 
 | Service (buy capability) | Provider (ERC-8004 agent) | Price | Used for |
 |---|---|---|---|
