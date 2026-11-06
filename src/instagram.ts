@@ -6,6 +6,7 @@ export type Post = {
   comments: number;
   views: number | null;
   caption: string;
+  pinned: boolean;
 };
 
 export type Profile = {
@@ -34,6 +35,7 @@ type RawPost = {
   comment_count?: number;
   play_count?: number | null;
   caption?: { text?: string } | null;
+  timeline_pinned_user_ids?: unknown[];
 };
 
 export type RawPosts = { output: { items?: RawPost[] } };
@@ -60,6 +62,7 @@ export function parsePosts(raw: RawPosts): Post[] {
     comments: p.comment_count ?? 0,
     views: p.play_count ?? null,
     caption: p.caption?.text ?? "",
+    pinned: (p.timeline_pinned_user_ids?.length ?? 0) > 0,
   }));
 }
 

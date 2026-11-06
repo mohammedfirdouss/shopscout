@@ -50,6 +50,28 @@ test("spots Nigerian and dollar prices", () => {
   assert.deepEqual(findPrices("New Party Edit #zara"), []);
 });
 
+test("drops trailing punctuation from prices", () => {
+  assert.deepEqual(findPrices("Wholesale: ₦48,000, retail ₦2,600."), ["₦48,000", "₦2,600"]);
+});
+
+test("posting rate ignores pinned posts at the top", () => {
+  const day = 86400;
+  const base = { kind: "photo" as const, likes: 1, comments: 0, views: null, caption: "", pinned: false };
+  const pinnedOld = { ...base, code: "old", takenAt: newest - 300 * day, pinned: true };
+  const recent = [0, 7, 14, 21].map((i) => ({ ...base, code: `r${i}`, takenAt: newest - i * day }));
+  const report = compare({ username: "x", at: newest + 60, followers: 1, posts: [pinnedOld, ...recent] }, null);
+  assert.equal(report.postsPerWeek, 1);
+  assert.equal(report.newPosts.length, 1);
+  const burst = compare({ username: "x", at: newest + 60, followers: 1, posts: recent.slice(0, 2) }, null);
+  assert.equal(burst.postsPerWeek, null);
+});
+
+test("long price lists are shortened", () => {
+  const post = { code: "p", takenAt: newest, kind: "photo" as const, likes: 1, comments: 0, views: null, caption: "₦1 ₦2 ₦3 ₦4 ₦5 ₦6 ₦7", pinned: false };
+  const text = render([compare({ username: "x", at: newest + 60, followers: 1, posts: [post] }, null)]);
+  assert.match(text, /Prices mentioned: ₦1, ₦2, ₦3, ₦4, ₦5 and 2 more/);
+});
+
 test("spots promo language", () => {
   assert.deepEqual(findPromos("RESTOCK alert 🔥 20% off + free delivery in Lagos"), ["% off", "free delivery", "restock"]);
   assert.deepEqual(findPromos("Evening Collection"), []);

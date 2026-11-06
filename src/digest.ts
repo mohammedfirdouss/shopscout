@@ -15,10 +15,11 @@ export type CompetitorReport = {
   top: Post | null;
   prices: string[];
   promos: string[];
-  postsPerWeek: number;
+  postsPerWeek: number | null;
 };
 
 const WEEK = 7 * 24 * 60 * 60;
+const MAX_PRICES = 5;
 
 const PROMO_WORDS = [
   "sale",
@@ -39,10 +40,11 @@ const PROMO_WORDS = [
   "bundle",
   "buy 1",
   "buy one",
-  "code",
+  "use code",
+  "promo code",
 ];
 
-const PRICE = /(?:₦|ngn\s?|n(?=\d)|\$|£|€)\s?\d[\d,.]*\s?k?\b|\b\d[\d,.]*\s?(?:naira|k)\b/gi;
+const PRICE = /(?:₦|ngn\s?|n(?=\d)|\$|£|€)\s?\d(?:[\d,.]*\d)?\s?k?\b|\b\d(?:[\d,.]*\d)?\s?(?:naira|k)\b/gi;
 
 export function engagement(p: Post): number {
   return p.likes + p.comments * 3;
@@ -66,7 +68,9 @@ export function compare(now: Snapshot, before: Snapshot | null): CompetitorRepor
     .filter((p) => !seen.has(p.code) && p.takenAt > since)
     .sort((a, b) => b.takenAt - a.takenAt);
   const top = [...newPosts].sort((a, b) => engagement(b) - engagement(a))[0] ?? null;
-  const span = now.posts.length > 1 ? now.posts[0].takenAt - now.posts[now.posts.length - 1].takenAt : 0;
+  // Pinned posts sit at the top whatever their age, so leave them out of the rate.
+  const times = now.posts.filter((p) => !p.pinned).map((p) => p.takenAt).sort((a, b) => b - a);
+  const span = times.length > 1 ? times[0] - times[times.length - 1] : 0;
   return {
     username: now.username,
     followers: now.followers,
@@ -75,7 +79,8 @@ export function compare(now: Snapshot, before: Snapshot | null): CompetitorRepor
     top,
     prices: [...new Set(newPosts.flatMap((p) => findPrices(p.caption)))],
     promos: [...new Set(newPosts.flatMap((p) => findPromos(p.caption)))],
-    postsPerWeek: span > 0 ? Math.round(((now.posts.length - 1) / span) * WEEK * 10) / 10 : 0,
+    // Only meaningful when the posts we can see cover at least two weeks.
+    postsPerWeek: span >= 2 * WEEK ? Math.round(((times.length - 1) / span) * WEEK * 10) / 10 : null,
   };
 }
 
@@ -110,9 +115,13 @@ export function render(reports: CompetitorReport[], failed: string[] = []): stri
     lines.push("", `@${r.username}`);
     const followers = `${r.followers.toLocaleString("en")} followers`;
     lines.push(r.followerChange === null ? `• ${followers}` : `• ${followers} (${signed(r.followerChange)} since last report)`);
-    lines.push(`• ${r.newPosts.length} new post${r.newPosts.length === 1 ? "" : "s"}, usually ${r.postsPerWeek} a week`);
+    const usual = r.postsPerWeek === null ? "" : `, usually ${r.postsPerWeek} a week`;
+    lines.push(`• ${r.newPosts.length} new post${r.newPosts.length === 1 ? "" : "s"}${usual}`);
     if (r.top) lines.push(`• Best: "${firstLine(r.top.caption)}" (${r.top.likes.toLocaleString("en")} likes) instagram.com/p/${r.top.code}`);
-    if (r.prices.length) lines.push(`• Prices mentioned: ${r.prices.join(", ")}`);
+    if (r.prices.length) {
+      const more = r.prices.length > MAX_PRICES ? ` and ${r.prices.length - MAX_PRICES} more` : "";
+      lines.push(`• Prices mentioned: ${r.prices.slice(0, MAX_PRICES).join(", ")}${more}`);
+    }
     if (r.promos.length) lines.push(`• Promo signals: ${r.promos.join(", ")}`);
   }
 
