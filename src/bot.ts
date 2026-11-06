@@ -2,7 +2,7 @@ import { Bot } from "grammy";
 import { config } from "./config.ts";
 import { normaliseHandle } from "./instagram.ts";
 import { rateProviders } from "./reputation.ts";
-import { runDigest } from "./scout.ts";
+import { PaymentRefused, runDigest } from "./scout.ts";
 import { allSellers, getSeller, MAX_COMPETITORS, updateSeller, upsertSeller, type Seller } from "./store.ts";
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -28,7 +28,11 @@ async function deliver(seller: Seller) {
   try {
     const result = await runDigest(seller);
     await bot.api.sendMessage(seller.chatId, result.text, { link_preview_options: { is_disabled: true } });
-    console.log(`[digest] chat ${seller.chatId}: ${result.calls} paid calls, ${Number(result.spentAtomic) / 1e6} USDC`);
+    console.log(`[digest] chat ${seller.chatId}: ${result.calls} paid calls, ${Number(result.spentAtomic) / 1e6} ${config.payToken}`);
+  } catch (error) {
+    if (!(error instanceof PaymentRefused)) throw error;
+    console.error(`[digest] chat ${seller.chatId}: payment refused, check the agent wallet balance: ${error.message.slice(0, 120)}`);
+    await bot.api.sendMessage(seller.chatId, "Your report is running late on my side. I'll send it as soon as it's ready 🙏");
   } finally {
     running.delete(seller.chatId);
   }

@@ -6,7 +6,6 @@ import type { Receipt } from "./pay.ts";
 import { publicClient, walletClient } from "./wallet.ts";
 
 const REPUTATION_REGISTRY = "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63";
-const USDC_FEE_ADAPTER = "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B";
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 
 // The ERC-8004 agent behind each capability ShopScout pays for (from the buy catalog).
@@ -67,7 +66,7 @@ export async function rateProviders() {
       abi,
       functionName: "giveFeedback",
       args: [provider.agentId, score, 0, "reliability", "shopscout", `${config.gateway}/v1/social/instagram`, "", zeroHash],
-      feeCurrency: USDC_FEE_ADAPTER,
+      feeCurrency: config.feeCurrency,
     });
     await publicClient.waitForTransactionReceipt({ hash });
     console.log(`[reputation] rated ${provider.name} ${score}/100 over ${calls.length} calls: ${config.explorer}/tx/${hash}`);

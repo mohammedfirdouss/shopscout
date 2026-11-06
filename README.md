@@ -14,7 +14,7 @@ The seller never sees crypto. ShopScout's agent wallet pays for the data.
 
 ## How it pays for data
 
-Instagram data comes from the [buy](https://usebuy.ai) gateway, paid per call over [x402](https://x402.celo.org) in USDC on Celo mainnet. ShopScout doesn't own these services.
+Instagram data comes from the [buy](https://usebuy.ai) gateway, paid per call over [x402](https://x402.celo.org) in USA₮ (or USDC, via `SHOPSCOUT_PAY_TOKEN`) on Celo mainnet. ShopScout doesn't own these services.
 
 | Service (buy capability) | Provider (ERC-8004 agent) | Price | Used for |
 |---|---|---|---|
@@ -25,7 +25,7 @@ Each watched page costs 2 calls a week, so a seller watching 5 pages costs $0.05
 
 1. gets a `402` with the price,
 2. is checked against a spend cap (`$0.03` per call, `$0.20` per report), and refused before signing if it's over,
-3. is paid with a signed USDC authorisation from the agent wallet (`@x402/fetch`),
+3. is paid with a signed stablecoin authorisation from the agent wallet (`@x402/fetch`),
 4. is logged to `data/receipts.jsonl` with its settlement transaction.
 
 Failed calls are never retried automatically, because the payment may already have settled. `node scripts/receipts.ts mainnet` prints every settled payment as a table with Celoscan links. That table is the proof of payment for the submission.
@@ -36,7 +36,7 @@ Once a week the agent also rates the provider it paid on the ERC-8004 Reputation
 
 - The agent wallet registers ShopScout on the ERC-8004 Identity Registry (`scripts/register.ts`, with the registration file at [`agent/registration.json`](agent/registration.json)).
 - Every transaction the agent sends itself (registration, reputation) goes through one viem client extended with `withAttribution("celo_27b2ca7b058f")` ([`src/wallet.ts`](src/wallet.ts)). The register script checks the tag on-chain with `verifyTx` and fails if it's missing.
-- Gas for those transactions is paid in USDC through Celo fee abstraction, so the wallet holds no CELO.
+- Gas for those transactions is paid in the same stablecoin through Celo fee abstraction, so the wallet holds no CELO.
 
 ## Run it
 

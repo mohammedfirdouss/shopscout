@@ -7,7 +7,6 @@ import { config } from "../src/config.ts";
 import { account, publicClient, walletClient } from "../src/wallet.ts";
 
 const IDENTITY_REGISTRY = "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432";
-const USDC_FEE_ADAPTER = "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B";
 const AGENT_URI = "https://raw.githubusercontent.com/mohammedfirdouss/shopscout/main/agent/registration.json";
 
 const abi = [
@@ -38,7 +37,7 @@ const { request } = await publicClient.simulateContract({
   functionName: "register",
   args: [AGENT_URI],
 });
-const hash = await walletClient.writeContract({ ...request, feeCurrency: USDC_FEE_ADAPTER });
+const hash = await walletClient.writeContract({ ...request, feeCurrency: config.feeCurrency });
 const receipt = await publicClient.waitForTransactionReceipt({ hash });
 const [registered] = parseEventLogs({ abi, eventName: "Registered", logs: receipt.logs });
 

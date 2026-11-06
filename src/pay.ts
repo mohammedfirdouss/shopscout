@@ -29,7 +29,7 @@ const paidFetch = wrapFetchWithPaymentFromConfig(fetch, {
   schemes: [{ network: config.caip2, client: new ExactEvmScheme(account) }],
   spendControls: {
     maxAmountPerPayment: false,
-    allowedAssets: [{ network: config.caip2, asset: config.usdc, maxAmountPerPayment: String(config.maxPerCallAtomic) }],
+    allowedAssets: [{ network: config.caip2, asset: config.payAsset, maxAmountPerPayment: String(config.maxPerCallAtomic) }],
   },
 });
 
